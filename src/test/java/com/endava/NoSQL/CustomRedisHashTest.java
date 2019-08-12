@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -29,6 +30,7 @@ public class CustomRedisHashTest {
     @Autowired
     ProductViewEventServiceImp productViewEventServiceImp;
 
+    @Qualifier("customeRedisHashRepositoryImpl")
     @Autowired
     CustomRedisHashRepository customeRedisHashRepository;
 
@@ -39,8 +41,7 @@ public class CustomRedisHashTest {
         gson = new Gson();
         productViewEventServiceImp.findAll().stream().forEach(productViewEvent -> {
             customeRedisHashRepository.AddKeyValueForSortedSet(productViewEvent);
-            /*            System.out.println(productViewEvent.getId()+" "+productViewEvent.getDateTimeViewed().getTime());
-             */
+            System.out.println(productViewEvent.getId() + " " + productViewEvent.getDateTimeViewed().getTime());
         });
 
 
@@ -51,15 +52,15 @@ public class CustomRedisHashTest {
 
         Optional<ProductViewEvent> elementFromSortedSetByScore = getElementByScore();
         System.out.println(gson.toJson(elementFromSortedSetByScore.get()));
-        assertEquals("Test passed!", elementFromSortedSetByScore.get().getDateTimeViewed().getTime(), 1565527195331d, 0.1d);
+        assertEquals(elementFromSortedSetByScore.get().getId().longValue(), 1);
 
     }
 
 
     @Test
     public void TestGetByRange() {
-        customeRedisHashRepository.getByRange(0l,3l).forEach(productViewEvent -> System.out.println(productViewEvent.toString()));
-        assertEquals(customeRedisHashRepository.getByRange(0L, 3L).size(),4);
+        customeRedisHashRepository.getByRange(0l, 3l).forEach(productViewEvent -> System.out.println(productViewEvent.toString()));
+        assertEquals(customeRedisHashRepository.getByRange(0L, 3L).size(), 4);
 
     }
 
@@ -68,7 +69,7 @@ public class CustomRedisHashTest {
         Long numberOfElementsBeforeDeleteOperationInSortedSet = customeRedisHashRepository.countMembers();
         customeRedisHashRepository.removeReturnedFromSetByLowestScore();
         Long numberOfElementsAfterDeleteOperationInSortedSet = customeRedisHashRepository.countMembers();
-        assertNotEquals(numberOfElementsAfterDeleteOperationInSortedSet,numberOfElementsBeforeDeleteOperationInSortedSet);
+        assertNotEquals(numberOfElementsAfterDeleteOperationInSortedSet, numberOfElementsBeforeDeleteOperationInSortedSet);
 
     }
 
@@ -76,11 +77,11 @@ public class CustomRedisHashTest {
     public void TestCountOfMembersFromSet() {
 
         Long numberOfElementsInSortedSet = customeRedisHashRepository.countMembers();
-        //assertEquals(numberOfElementsInSortedSet,5);
+        assertEquals(numberOfElementsInSortedSet.longValue(), 5);
     }
 
     private Optional<ProductViewEvent> getElementByScore() {
-        return customeRedisHashRepository.getElementFromSortedSetByScore(0d, 1565527195331d).stream().findFirst();
+        return customeRedisHashRepository.getElementFromSortedSetByScore(0d, 1565620926454d).stream().findFirst();
     }
 
 }

@@ -10,11 +10,14 @@ import java.util.Set;
 public interface CustomRedisHashRepository {
 
     public boolean AddKeyValueForSortedSet(ProductViewEvent productViewEvent);
-    public Set<ProductViewEvent> getByRange(Long min, Long max);
-    public Long removeReturnedFromSetByLowestScore();
-    public Set<ProductViewEvent> getElementFromSortedSetByScore(Double range1,Double range2);
-    public Long countMembers();
 
+    public Set<ProductViewEvent> getByRange(Long min, Long max);
+
+    public Long removeReturnedFromSetByLowestScore();
+
+    public Set<ProductViewEvent> getElementFromSortedSetByScore(Double range1, Double range2);
+
+    public Long countMembers();
 
 
 }
